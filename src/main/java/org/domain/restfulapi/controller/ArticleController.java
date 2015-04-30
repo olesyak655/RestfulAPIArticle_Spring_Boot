@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(value="/articles")
-@Controller
+@RestController
 public class ArticleController {
 
 	@Autowired 
@@ -29,7 +30,7 @@ public class ArticleController {
 		this.articleService = articleService;
 	}
 	
-	@RequestMapping(method=RequestMethod.GET)
+	@RequestMapping(value="/", method=RequestMethod.GET)
 	@ResponseBody
 	public  List<Article> findAll() {
 		return articleService.findAll();
