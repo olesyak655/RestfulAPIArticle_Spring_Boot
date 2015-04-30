@@ -8,7 +8,7 @@ public interface ArticleService {
 	public List<Article> findAll();
 	public Article findById(long id) throws ArticleNotFoundException;
 	public Article save(Article article);
-	public Article update(Article article) throws ArticleNotFoundException;
+	public Article update(long id, Article article) throws ArticleNotFoundException;
 	public void deleteById(long id) throws ArticleNotFoundException;
 	
 }

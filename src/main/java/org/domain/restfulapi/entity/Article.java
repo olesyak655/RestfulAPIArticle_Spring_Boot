@@ -132,9 +132,9 @@ public class Article implements Serializable {
 	}
 
 	public void update(Article article) {
-		this.id = article.id;
 		this.titleArticle = article.titleArticle;
-		this.bodyArticle = article.author;
+		this.bodyArticle = article.bodyArticle;
+		this.author = article.author;
 	}
 	
 	@Override

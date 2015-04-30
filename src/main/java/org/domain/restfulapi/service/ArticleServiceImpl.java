@@ -43,8 +43,8 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 	
 	@Transactional(rollbackFor = {ArticleNotFoundException.class})
-	public Article update(Article updated) throws ArticleNotFoundException {
-		Article articleForUpdate = findById(updated.getId());
+	public Article update(long id, Article updated) throws ArticleNotFoundException {
+		Article articleForUpdate = findById(id);
 		articleForUpdate.update(updated);
 		return articleForUpdate;
 	}

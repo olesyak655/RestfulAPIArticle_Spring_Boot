@@ -52,8 +52,8 @@ public class ArticleController {
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.PUT) 
 	@ResponseBody 
-	public Article update(@RequestBody Article article, @PathVariable Long id) throws ArticleNotFoundException { 
-		return articleService.update(article); 
+	public Article update(@PathVariable Long id, @RequestBody Article article) throws ArticleNotFoundException { 
+		return articleService.update(id, article); 
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE) 

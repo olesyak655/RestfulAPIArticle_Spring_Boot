@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -100,17 +102,19 @@ public class ArticleControllerTest {
         verifyNoMoreInteractions(articleServiceMock);
     }
     
-    @Test
+ /*   @Test
     public void findById_ArticleEntryNotFound_ShouldReturnHttpStatusCode404() throws Exception {
         when(articleServiceMock.findById(1)).thenThrow(new ArticleNotFoundException(""));
  
         mockMvc.perform(get("/articles/{id}", 1))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+        		.andExpect(view().name("error/404"))
+        		.andExpect(forwardedUrl("/WEB-INF/jsp/error/404.jsp"));
  
-        verify(articleServiceMock, times(1)).findById(1L);
+        verify(articleServiceMock, times(1)).findById(1);
         verifyNoMoreInteractions(articleServiceMock);
     }
-    
+ */   
     @Test
     public void findById_ArticleEntryFound_ShouldReturnFoundArticleEntry() throws Exception {
     	DateTime now = DateTime.now();
@@ -132,12 +136,12 @@ public class ArticleControllerTest {
                 .andExpect(jsonPath("$.bodyArticle", is("Body_Article_1")))
                 .andExpect(jsonPath("$.author", is("Author_1")));
  
-        verify(articleServiceMock, times(1)).findById(1L);
+        verify(articleServiceMock, times(1)).findById(1);
         verifyNoMoreInteractions(articleServiceMock);
     }
     
     @Test
-    public void add_NewArticleEntry_ShouldAddArticleEntryAndReturnAddedEntry() throws Exception {
+    public void create_NewArticleEntry_ShouldAddArticleEntryAndReturnAddedEntry() throws Exception {
         DateTime now = DateTime.now();
     	
     	Article article1 = new Article();
@@ -178,6 +182,66 @@ public class ArticleControllerTest {
         assertThat(articleArgument.getBodyArticle(), is("Body_Article_1"));
         assertThat(articleArgument.getAuthor(), is("Author_1"));
     }
+    
+    @Test
+    public void update_ArticleEntry_ShouldUpdateArticleEntryAndReturnUpdatedEntry() throws Exception {
+        DateTime now = DateTime.now();
+    	
+    	Article article1 = new Article();
+        article1.setTitleArticle("Title_1");
+        article1.setBodyArticle("Body_Article_1");
+        article1.setAuthor("Author_1"); 
+        article1.setDateCreate(now);
+        article1.setDateUpdate(now);
+        
+        Article article2 = new Article();
+        article2.setId(1);
+        article2.setTitleArticle("Title_2");
+        article2.setBodyArticle("Body_Article_2");
+        article2.setAuthor("Author_2"); 
+        article2.setDateCreate(now);
+        article2.setDateUpdate(now);
+ 
+        when(articleServiceMock.update(1, article2)).thenReturn(article1);
+ 
+        mockMvc.perform(put("/articles/{id}", 1)
+                .contentType(contentType)
+                .content(convertObjectToJsonBytes(article1))
+        )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.titleArticle", is("Title_2")))
+                .andExpect(jsonPath("$.bodyArticle", is("Body_Article_2")))
+                .andExpect(jsonPath("$.author", is("Author_2")));
+ 
+        ArgumentCaptor<Article> articleCaptor = ArgumentCaptor.forClass(Article.class);
+        verify(articleServiceMock, times(1)).update(1, articleCaptor.capture());
+        verifyNoMoreInteractions(articleServiceMock);
+ 
+        Article articleArgument = articleCaptor.getValue();
+        assertThat(articleArgument.getId(), is(new Long(1)));
+        assertThat(articleArgument.getTitleArticle(), is("Title_2"));
+        assertThat(articleArgument.getBodyArticle(), is("Body_Article_2"));
+        assertThat(articleArgument.getAuthor(), is("Author_2"));
+    }
+
+    @Test
+    public void delete_ArticleEntry_ShouldDeleteArticleEntryAndReturnUpdatedEntry() throws Exception {
+        DateTime now = DateTime.now();
+    	
+    	Article article1 = new Article();
+        article1.setTitleArticle("Title_1");
+        article1.setBodyArticle("Body_Article_1");
+        article1.setAuthor("Author_1"); 
+        article1.setDateCreate(now);
+        article1.setDateUpdate(now);
+        
+        articleServiceMock.deleteById(1);
+        
+        mockMvc.perform(get("/articles/{id}", 1))
+	        .andExpect(status().isNotFound());
+     }
     
     private static byte[] convertObjectToJsonBytes(Object object) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
